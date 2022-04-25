@@ -1,6 +1,12 @@
 const { User, Thought } = require('../models');
+// GraphQL built in authentication error handling
+const { AuthenticationError } = require('apollo-server-express');
+// imports signToken function for authentication
+const { signToken } = require('../utils/auth');
 
 
+
+// The resolvers object to handling queries and mutations
 const resolvers = {
   Query: {
     // get all thoughts
@@ -26,6 +32,33 @@ const resolvers = {
         .populate('friends')
         .populate('thoughts');
     },
+  },
+
+  Mutation: {
+    addUser: async (parent, args) => {
+      const user = await User.create(args);
+      // authentication
+      const token = signToken(user);
+
+      return { token, user };
+    },
+    login: async (parent, { email, password }) => {
+      const user = await User.findOne({ email });
+    
+      if (!user) {
+        throw new AuthenticationError('Incorrect credentials');
+      }
+    
+      const correctPw = await user.isCorrectPassword(password);
+    
+      if (!correctPw) {
+        throw new AuthenticationError('Incorrect credentials');
+      }
+      // authentication
+      const token = signToken(user);
+    
+      return { token, user };
+    }
   }
 };
 
