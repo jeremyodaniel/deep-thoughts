@@ -34,6 +34,7 @@ const typeDefs = gql`
   }
 
   type Query {
+    me: User
     users: [User]
     user(username: String!): User   # The "!" indicates that data must exist or 
                                     # an error will be returned.
@@ -44,6 +45,9 @@ const typeDefs = gql`
   type Mutation {
     login(email: String!, password: String!): Auth  #User was the previous object returned before authentication was provided
     addUser(username: String!, email: String!, password: String!): Auth  # User was the previous object returned before authentication was provided
+    addThought(thoughtText: String!): Thought
+    addReaction(thoughtId: ID!, reactionBody: String!): Thought
+    addFriend(friendId: ID!): User
   }
 `;
 
